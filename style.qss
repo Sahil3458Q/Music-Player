@@ -13,11 +13,63 @@
     background-color : rgba(81, 212, 206, 155);
     border-radius : 10px;
     color : rgba(10, 0, 0, 255);
+    font: bold 14px "Segoe UI", sans-serif;
+}
+
+QSlider::handle:horizontal {
+    background: #FFFFFF;
+    border: 2px solid #007ACC;
+    width: 16px;
+    height: 16px;
+    margin: -5px 0px; 
+    border-radius: 7px; 
+}
+
+QSlider::groove:horizontal {
+    border: none;
+    height: 6px;
+    background: #4A4A4A;
+    border-radius: 3px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #007ACC;
+    border-radius: 3px;
+}
+
+QSlider::add-page:horizontal {
+    background: #333333;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: #FFFFFF;
+    border: 2px solid #007ACC;
+    width: 16px;
+    height: 16px;
+    margin: -5px 0px; 
+    border-radius: 8px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #007ACC;
+    border: 2px solid #005999;
+}
+
+QSlider::handle:horizontal:pressed {
+    background: #005999;
+    border: 2px solid #003F6B;
 }
 
 QPushButton {
-    background-color: rgba(53, 144, 136, 99); 
-    color: rgb(0, 0, 0);
+    background-color: #3498db;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    border: 2px solid #2980b9;
+    border-radius: 6px;
+    padding: 6px 12px;
+    min-width: 80px;
 }
 
 QPushButton:hover {
@@ -31,3 +83,4 @@ QPushButton:hover {
     background-color : rgba(56, 160, 158, 202); 
 
 }
+
