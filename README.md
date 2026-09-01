@@ -44,9 +44,13 @@ python main.py
 
 ## 🪟 Windows
 
-A ready-to-use Windows executable is available in the **Releases** section.
+A ready-to-use Windows executable is available for Windows users.
 
-Download the latest release and run the `.exe` file.
+### 📥 Download
+
+**[Download Music Player for Windows](../../releases/latest)**
+
+Download `MusicPlayer.exe` from the latest release and run it.
 
 ## 🔮 Future Plans
 
