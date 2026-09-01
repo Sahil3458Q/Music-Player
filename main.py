@@ -1,14 +1,16 @@
-import PySide6.QtWidgets as p ,sys
+import PySide6.QtWidgets as p 
 import PySide6.QtCore as q
 import PySide6.QtGui as g
 import PySide6.QtMultimedia as m
+import os
+import sys
 
 class GUI(p.QMainWindow):
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Music player")
-        self.resize(700,500)
+        self.resize(600,500)
 
         self.window = p.QWidget()
         self.setCentralWidget(self.window)
@@ -100,9 +102,18 @@ class GUI(p.QMainWindow):
         self.player.durationChanged.connect(self.prepare)
         
 
+
     def open_file(self):
-        self.url = p.QFileDialog.getOpenFileUrl(filter="Audio Files (*.mp3  , *.wav)")
-        self.player.setSource(self.url[0])
+        self.file = p.QFileDialog.getOpenFileName(
+            self,
+            "Select Audio File",
+            "",
+            "Audio Files (*.mp3 *.wav)"
+        )
+    
+        if self.file[0]:
+            self.player.setSource(q.QUrl.fromLocalFile(self.file[0]))
+            self.player.play()
 
 
     def prepare(self):
@@ -115,12 +126,13 @@ class GUI(p.QMainWindow):
         metadata = self.player.metaData()
         title = m.QMediaMetaData.value(metadata,m.QMediaMetaData.Key.Title)
         self.song_title.setText(title)
-        self.artist.setText(m.QMediaMetaData.value(metadata,m.QMediaMetaData.Key.Author))
+    
+        self.artist.setText("By : "+m.QMediaMetaData.value(metadata,m.QMediaMetaData.Key.ContributingArtist)[0])
 
-        cover = metadata.value(m.QMediaMetaData.Key.CoverArtImage)
+        cover = metadata.value(m.QMediaMetaData.Key.ThumbnailImage)
 
         if not cover.isNull():
-            pixmap = g.QPixmap.fromImage(cover)
+            pixmap = g.QPixmap.fromImage(cover).scaled(250,250,aspectMode=q.Qt.AspectRatioMode.KeepAspectRatio)
             self.alb_label.setPixmap(pixmap)
 
     def play_Song(self):
@@ -145,8 +157,15 @@ class GUI(p.QMainWindow):
         self.player.setPosition(pos*1000)
         
 
+def resource_path(filename):
+    if getattr(sys, "frozen", False):
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+
 app = p.QApplication()
 window = GUI()
-app.setStyleSheet(open("style.qss").read())
+app.setStyleSheet(open(resource_path("style.qss" ),"r").read())
 window.show()
 sys.exit(app.exec())
+
+
