@@ -6,7 +6,7 @@ This is a beginner-friendly project created while learning GUI development with 
 
 ## 📸 Screenshot
 
-
+![Music Player](image.png)
 
 ## ✨ Features
 
