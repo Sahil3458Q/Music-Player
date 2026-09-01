@@ -1,5 +1,5 @@
 #main{
-    background-color : rgba(8, 251, 125, 255); 
+    background-color : rgba(8, 239, 251, 255); 
 }
 
 #header{
@@ -18,4 +18,11 @@
 QPushButton {
     background-color: rgba(53, 144, 136, 99); 
     color: rgb(0, 0, 0);
+}
+
+#frame{
+    border-radius:13px;
+    border : px 'black';
+    background-color : rgba(56, 160, 158, 202); 
+
 }

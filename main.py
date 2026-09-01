@@ -1,6 +1,7 @@
 import PySide6.QtWidgets as p ,sys
 import PySide6.QtCore as q
 import PySide6.QtGui as g
+import PySide6.QtMultimedia as m
 
 class GUI(p.QMainWindow):
 
@@ -38,7 +39,6 @@ class GUI(p.QMainWindow):
         self.central.addStretch()
         #progress Bar 
         self.prg = p.QSlider(q.Qt.Orientation.Horizontal)
-        self.prg.setRange(0,100)
         self.central.addWidget(self.prg,alignment=q.Qt.AlignmentFlag.AlignCenter)
         self.prg.setFixedWidth(300)
 
@@ -61,14 +61,22 @@ class GUI(p.QMainWindow):
         self.prevs = p.QPushButton("Previous")
         self.play = p.QPushButton("Play")
         self.nxt = p.QPushButton("Next")
+        self.opn = p.QPushButton("Open")
+        self.commands.addWidget(self.opn)
         self.commands.addWidget(self.prevs)
         self.commands.addWidget(self.play)
         self.commands.addWidget(self.nxt)
         self.central.addLayout(self.commands)
         self.volume = p.QSlider(q.Qt.Orientation.Horizontal)
-        self.volume.setFixedWidth(70)
+        self.volume.setFixedWidth(80)
         self.volume.setRange(0,100)
         self.commands.addWidget(self.volume)
+
+        #signals
+        
+        self.opn.clicked.connect(self.open_file)
+        self.play.clicked.connect(self.play_Song)
+        self.prg.sliderMoved.connect(self.prg_change)
 
         #Properties
         self.artist.setObjectName("header")
@@ -77,7 +85,48 @@ class GUI(p.QMainWindow):
         self.current.setObjectName("time")
         self.total.setObjectName("time")
 
+        self.album.setObjectName("frame")
         self.setObjectName("main")
+
+        #MUSIC
+        self.player = m.QMediaPlayer()
+        self.audio = m.QAudioOutput()
+        self.player.setAudioOutput(self.audio)
+        self.player.positionChanged.connect(self.prg_song)
+        self.player.metaDataChanged.connect(self.prepare)
+        
+
+    def open_file(self):
+        self.url = p.QFileDialog.getOpenFileUrl(filter="Audio Files (*.mp3)")
+        self.player.setSource(self.url[0])
+
+
+    def prepare(self):
+        dur = self.player.duration()
+        self.prg.setRange(0,dur//1000)
+        min = dur//60000 if dur//1000>60 else 0
+        sec = (dur//1000 - min*60)
+        self.total.setText(f"{min}:{sec}")
+
+
+
+    def play_Song(self):
+        if self.player.isPlaying(): 
+            self.player.pause()
+            self.play.setText("Play")
+        else:
+            self.player.play()
+            self.play.setText("Pause")
+            
+ 
+    def prg_song(self,position):
+        self.prg.setValue(position//1000)
+        min = position//60000 if position//1000>60 else 0
+        sec = str(position//1000 - min*60) if (position//1000 - min*60)>10  else str("0")+str(position//1000 - min*60)
+        self.current.setText(f"{min}:{sec}")
+
+    def prg_change(self):
+        self.player.setPosition(self.prg.sliderPosition()*1000)
         
 
 app = p.QApplication()
