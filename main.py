@@ -23,8 +23,9 @@ class GUI(p.QMainWindow):
         self.alb_label = p.QLabel("ALBUM")
         self.alb_lay.addWidget(self.alb_label ,alignment=q.Qt.AlignmentFlag.AlignTop | q.Qt.AlignmentFlag.AlignCenter)
 
-        self.image = g.QPixmap("image.png").scaled(250,250,aspectMode=q.Qt.AspectRatioMode.KeepAspectRatio)
-        self.alb_label.setPixmap(self.image )
+        self.imageurl = "image.png"
+        self.image = g.QPixmap(self.imageurl).scaled(250,250,aspectMode=q.Qt.AspectRatioMode.KeepAspectRatio)
+        self.alb_label.setPixmap(self.image)
         
         self.central.addStretch()
         self.song_title = p.QLabel("--")
@@ -72,11 +73,6 @@ class GUI(p.QMainWindow):
         self.volume.setRange(0,100)
         self.commands.addWidget(self.volume)
 
-        #signals
-        
-        self.opn.clicked.connect(self.open_file)
-        self.play.clicked.connect(self.play_Song)
-        self.prg.sliderMoved.connect(self.prg_change)
 
         #Properties
         self.artist.setObjectName("header")
@@ -88,16 +84,24 @@ class GUI(p.QMainWindow):
         self.album.setObjectName("frame")
         self.setObjectName("main")
 
+        #signals
+
+        self.opn.clicked.connect(self.open_file)
+        self.play.clicked.connect(self.play_Song)
+        self.prg.sliderMoved.connect(self.prg_change)
+        self.volume.sliderMoved.connect(self.volumechange)
+
         #MUSIC
         self.player = m.QMediaPlayer()
         self.audio = m.QAudioOutput()
+        self.volume.setValue(self.audio.volume()*100)
         self.player.setAudioOutput(self.audio)
         self.player.positionChanged.connect(self.prg_song)
-        self.player.metaDataChanged.connect(self.prepare)
+        self.player.durationChanged.connect(self.prepare)
         
 
     def open_file(self):
-        self.url = p.QFileDialog.getOpenFileUrl(filter="Audio Files (*.mp3)")
+        self.url = p.QFileDialog.getOpenFileUrl(filter="Audio Files (*.mp3  , *.wav)")
         self.player.setSource(self.url[0])
 
 
@@ -108,7 +112,16 @@ class GUI(p.QMainWindow):
         sec = (dur//1000 - min*60)
         self.total.setText(f"{min}:{sec}")
 
+        metadata = self.player.metaData()
+        title = m.QMediaMetaData.value(metadata,m.QMediaMetaData.Key.Title)
+        self.song_title.setText(title)
+        self.artist.setText(m.QMediaMetaData.value(metadata,m.QMediaMetaData.Key.Author))
 
+        cover = metadata.value(m.QMediaMetaData.Key.CoverArtImage)
+
+        if not cover.isNull():
+            pixmap = g.QPixmap.fromImage(cover)
+            self.alb_label.setPixmap(pixmap)
 
     def play_Song(self):
         if self.player.isPlaying(): 
@@ -117,7 +130,10 @@ class GUI(p.QMainWindow):
         else:
             self.player.play()
             self.play.setText("Pause")
-            
+
+
+    def volumechange(self ,value):
+        self.audio.setVolume(value/100)
  
     def prg_song(self,position):
         self.prg.setValue(position//1000)
@@ -125,8 +141,8 @@ class GUI(p.QMainWindow):
         sec = str(position//1000 - min*60) if (position//1000 - min*60)>10  else str("0")+str(position//1000 - min*60)
         self.current.setText(f"{min}:{sec}")
 
-    def prg_change(self):
-        self.player.setPosition(self.prg.sliderPosition()*1000)
+    def prg_change(self ,pos):
+        self.player.setPosition(pos*1000)
         
 
 app = p.QApplication()
